@@ -11,19 +11,18 @@ import (
 
 var DB *gorm.DB
 
-func Connect() {
-	var err error
-	DB, err = gorm.Open(postgres.Open(config.Cfg.DBUrl), &gorm.Config{})
+func InitDB() {
+	dsn := config.Cfg.DBUrl
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		log.Fatalf("Failed to connect to database: %v", err)
 	}
 
-	log.Println("Connected to PostgreSQL")
-
-	err = DB.AutoMigrate(&model.Task{})
+	err = db.AutoMigrate(&model.Task{})
 	if err != nil {
-		log.Fatalf("Failed to auto-migrate: %v", err)
+		log.Fatalf("Failed to auto-migrate database: %v", err)
 	}
 
+	DB = db
 	log.Println("Database migrated")
 }

@@ -5,20 +5,16 @@ import (
 	"github.com/xuexiangxu/go-task-processor/internal/config"
 	"github.com/xuexiangxu/go-task-processor/internal/db"
 	"github.com/xuexiangxu/go-task-processor/internal/handler"
+	"github.com/xuexiangxu/go-task-processor/internal/mq"
 )
 
 func main() {
 	config.LoadConfig()
-	db.Connect()
+	db.InitDB()
+	mq.InitRabbitMQ()
 
 	r := gin.Default()
-
-	api := r.Group("/api")
-	{
-		api.POST("/tasks", handler.CreateTaskHandler)
-		api.GET("/tasks/:id", handler.GetTaskHandler)
-		api.GET("/tasks", handler.ListTaskHandler)
-	}
+	handler.RegisterRoutes(r)
 
 	r.Run(":" + config.Cfg.Port)
 }
